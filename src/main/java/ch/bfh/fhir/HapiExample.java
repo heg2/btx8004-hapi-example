@@ -85,7 +85,27 @@ public class HapiExample {
 
             Observation myObservation = new Observation();
 
-            
+            myObservation.setStatus(ObservationStatus.FINAL);
+            myObservation.setId(Integer.toString(temporaryID++));
+
+            myObservation.setCode(
+                        new CodeableConcept()
+                                    .addCoding(
+                                                new Coding()
+                                                            .setCode("29463-7")
+                                                            .setSystem("http://loinc.org")
+                                                            .setDisplay("Body weight")));
+
+            myObservation.setValue(
+                        new Quantity()
+                                    .setValue(67)
+                                    .setSystem("http://unitsofmeasure.org")
+                                    .setCode("kg"));
+
+            myObservation.setSubject(
+                        new Reference("Patient/" + myPatient.getIdElement().getValue()));
+
+            printResource("Observation", myObservation);
 
             /*
              * 2 Create a Bundle and add the resources created above
@@ -106,6 +126,21 @@ public class HapiExample {
              */
 
             Bundle myBundle = new Bundle();
+            myBundle.setType(BundleType.TRANSACTION);
+            myBundle.addEntry()
+                        .setResource(myPatient)
+                        .setFullUrl("Patient/" + myPatient.getIdElement().getValue())
+                        .getRequest()
+                        .setUrl("Patient")
+                        .setMethod(Bundle.HTTPVerb.POST);
+            myBundle.addEntry()
+                        .setResource(myObservation)
+                        .setFullUrl("Observation/" + myObservation.getIdElement().getValue())
+                        .getRequest()
+                        .setUrl("Observation")
+                        .setMethod(Bundle.HTTPVerb.POST);
+
+            printResource("Bundle", myBundle);
 
             /*
              * 3 Upload the bundle to the medinf lab FHIR Server using the generic restful
@@ -121,7 +156,13 @@ public class HapiExample {
              * documentation
              */
 
-;
+            // // upload as bundle
+            // Bundle responseBundle = client.transaction().withBundle(myBundle).execute();
+            // printResource("Response Bundle", responseBundle);
+
+            // // or upload as single resource
+            // MethodOutcome outcome = client.create().resource(myObservation).execute();
+            // System.out.println("Created Observation with ID: " + outcome.getId());
 
             /*
              * 4 Of course, we can also read and search with the HAPI FHIR library
@@ -143,15 +184,30 @@ public class HapiExample {
              * ⚠️ please uncomment your create transactions above
              * ⚠️ so you don't spam the server with duplicate resources!
              * 
-             * @see https://hapifhir.io/hapi-fhir/docs/client/examples.html#fetch-all-pages-of-a-bundle
+             * @see https://hapifhir.io/hapi-fhir/docs/client/examples.html#fetch-all-pages-of-a-bundle 
              * for HAPI FHIR examples
              */
+            Patient patient = client.read()
+                        .resource(Patient.class)
+                        .withId("155")
+                        .execute();
 
+            printResource("Fetched patient", patient);
+
+            Bundle searchResult = client.search()
+                        .forResource("Observation")
+                        .where(Observation.SUBJECT.hasId("155"))
+                        .where(Observation.CODE.exactly()
+                                    .systemAndCode("http://loinc.org", "29463-7"))
+                        .returnBundle(Bundle.class)
+                        .execute();
+
+            printResource("Search result", searchResult);
 
             /*
              * 5 With HAPI FHIR, we can also validate the resources on our machine
-             *   - use the validator below to validate your resources
-             *   - print the stringified result of the validation
+             * - use the validator below to validate your resources
+             * - print the stringified result of the validation
              * 
              * The following info message is expected and should not concern you: 
              *    [main] INFO ca.uhn.fhir.validation.FhirValidator - Ph-schematron library
@@ -159,7 +215,16 @@ public class HapiExample {
              */
 
             FhirValidator validator = ctx.newValidator();
-            
+            ValidationResult result = validator.validateWithResult(myBundle);
+
+            if (result.isSuccessful()) {
+                  System.out.println("🎉 Your resource is valid FHIR!");
+            } else {
+                  System.out.println("Validation with " + result.getMessages().size() + " errors: ");
+                  result.getMessages().forEach(
+                        m -> System.out.println(" - " + m.getMessage())
+                  );
+            }
       }
 
       /*
