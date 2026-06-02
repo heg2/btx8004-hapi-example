@@ -2,7 +2,6 @@
 This is an example class for [HAPI FHIR client](https://hapifhir.io/hapi-fhir/docs/client/introduction.html) in the BTX8004 module.
 
 ## Setup
-### Java Development Kit
 - Make sure you have JDK installed in a version >= 17. You can check this in the terminal with the command `java --version`.
   - [If you're missing the JDK, follow this link](https://www.javathinking.com/blog/how-to-install-jdk-17/)
 - Verify that your JAVA_HOME variable is set. Check with `echo %JAVA_HOME%` (windows) or `echo $JAVA_HOME` (unix, macOS). 
