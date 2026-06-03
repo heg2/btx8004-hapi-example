@@ -50,14 +50,14 @@ public class HapiExample {
             Patient myPatient = new Patient();
 
             myPatient.addName()
-                        .addGiven("Elisabeth")
-                        .setFamily("Brönnimann");
+                        .addGiven("Donald")
+                        .setFamily("Duck");
 
-            myPatient.setGender(AdministrativeGender.FEMALE);
+            myPatient.setGender(AdministrativeGender.MALE);
 
             myPatient.setBirthDate(
                         new SimpleDateFormat("yyyy-MM-dd")
-                                    .parse("1947-05-03"));
+                                    .parse("1949-03-13"));
 
             myPatient.setId(Integer.toString(temporaryID++));
 
@@ -89,21 +89,24 @@ public class HapiExample {
             myObservation.setId(Integer.toString(temporaryID++));
 
             myObservation.setCode(
-                        new CodeableConcept()
-                                    .addCoding(
-                                                new Coding()
-                                                            .setCode("29463-7")
-                                                            .setSystem("http://loinc.org")
-                                                            .setDisplay("Body weight")));
+                  new CodeableConcept()
+                        .addCoding(
+                              new Coding()
+                                    .setCode("29463-7")
+                                    .setSystem("http://loinc.org")
+                                    .setDisplay("Body weight")
+                        )
+            );
 
             myObservation.setValue(
-                        new Quantity()
-                                    .setValue(67)
-                                    .setSystem("http://unitsofmeasure.org")
-                                    .setCode("kg"));
+                  new Quantity()
+                        .setValue(67)
+                        .setSystem("http://unitsofmeasure.org")
+                        .setCode("kg")
+            );
 
             myObservation.setSubject(
-                        new Reference("Patient/" + myPatient.getIdElement().getValue()));
+                  new Reference("Patient/" + myPatient.getIdElement().getValue()));
 
             printResource("Observation", myObservation);
 
@@ -128,17 +131,17 @@ public class HapiExample {
             Bundle myBundle = new Bundle();
             myBundle.setType(BundleType.TRANSACTION);
             myBundle.addEntry()
-                        .setResource(myPatient)
-                        .setFullUrl("Patient/" + myPatient.getIdElement().getValue())
-                        .getRequest()
-                        .setUrl("Patient")
-                        .setMethod(Bundle.HTTPVerb.POST);
+                  .setResource(myPatient)
+                  .setFullUrl("Patient/" + myPatient.getIdElement().getValue())
+                  .getRequest()
+                  .setUrl("Patient")
+                  .setMethod(Bundle.HTTPVerb.POST);
             myBundle.addEntry()
-                        .setResource(myObservation)
-                        .setFullUrl("Observation/" + myObservation.getIdElement().getValue())
-                        .getRequest()
-                        .setUrl("Observation")
-                        .setMethod(Bundle.HTTPVerb.POST);
+                  .setResource(myObservation)
+                  .setFullUrl("Observation/" + myObservation.getIdElement().getValue())
+                  .getRequest()
+                  .setUrl("Observation")
+                  .setMethod(Bundle.HTTPVerb.POST);
 
             printResource("Bundle", myBundle);
 
@@ -188,19 +191,19 @@ public class HapiExample {
              * for HAPI FHIR examples
              */
             Patient patient = client.read()
-                        .resource(Patient.class)
-                        .withId("155")
-                        .execute();
+                  .resource(Patient.class)
+                  .withId("155")
+                  .execute();
 
             printResource("Fetched patient", patient);
 
             Bundle searchResult = client.search()
-                        .forResource("Observation")
-                        .where(Observation.SUBJECT.hasId("155"))
-                        .where(Observation.CODE.exactly()
-                                    .systemAndCode("http://loinc.org", "29463-7"))
-                        .returnBundle(Bundle.class)
-                        .execute();
+                  .forResource("Observation")
+                  .where(Observation.SUBJECT.hasId("155"))
+                  .where(Observation.CODE.exactly()
+                              .systemAndCode("http://loinc.org", "29463-7"))
+                  .returnBundle(Bundle.class)
+                  .execute();
 
             printResource("Search result", searchResult);
 
