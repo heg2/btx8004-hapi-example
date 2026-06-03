@@ -50,14 +50,14 @@ public class HapiExample {
             Patient myPatient = new Patient();
 
             myPatient.addName()
-                        .addGiven("Elisabeth")
-                        .setFamily("Brönnimann");
+                  .addGiven("Donald")
+                  .setFamily("Duck");
 
-            myPatient.setGender(AdministrativeGender.FEMALE);
+            myPatient.setGender(AdministrativeGender.MALE);
 
             myPatient.setBirthDate(
-                        new SimpleDateFormat("yyyy-MM-dd")
-                                    .parse("1947-05-03"));
+                  new SimpleDateFormat("yyyy-MM-dd")
+                        .parse("1949-03-13"));
 
             myPatient.setId(Integer.toString(temporaryID++));
 
