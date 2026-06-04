@@ -1,6 +1,7 @@
 package ch.bfh.fhir;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.validation.FhirValidator;
 import ca.uhn.fhir.validation.ValidationResult;
@@ -50,8 +51,8 @@ public class HapiExample {
             Patient myPatient = new Patient();
 
             myPatient.addName()
-                        .addGiven("Donald")
-                        .setFamily("Duck");
+                  .addGiven("Donald")
+                  .setFamily("Duck");
 
             myPatient.setGender(AdministrativeGender.MALE);
 
@@ -106,9 +107,10 @@ public class HapiExample {
             );
 
             myObservation.setSubject(
-                  new Reference("Patient/" + myPatient.getIdElement().getValue()));
+                  new Reference("Patient/" + myPatient.getIdElement().getValue())
+            );
 
-            printResource("Observation", myObservation);
+            // printResource("Observation", myObservation);
 
             /*
              * 2 Create a Bundle and add the resources created above
@@ -159,11 +161,11 @@ public class HapiExample {
              * documentation
              */
 
-            // // upload as bundle
+            // upload as bundle
             // Bundle responseBundle = client.transaction().withBundle(myBundle).execute();
             // printResource("Response Bundle", responseBundle);
 
-            // // or upload as single resource
+            // // // or upload as single resource
             // MethodOutcome outcome = client.create().resource(myObservation).execute();
             // System.out.println("Created Observation with ID: " + outcome.getId());
 
