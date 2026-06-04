@@ -223,7 +223,7 @@ public class HapiExample {
             if (result.isSuccessful()) {
                   System.out.println("🎉 Your resource is valid FHIR!");
             } else {
-                  System.out.println("Validation with " + result.getMessages().size() + " errors: ");
+                  System.out.println("❌ Validation failed with " + result.getMessages().size() + " errors: ");
                   result.getMessages().forEach(
                         m -> System.out.println(" - " + m.getMessage())
                   );
